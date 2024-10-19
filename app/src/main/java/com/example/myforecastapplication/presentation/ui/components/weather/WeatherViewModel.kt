@@ -43,6 +43,10 @@ class WeatherViewModel @Inject constructor(
     private val _backgroundImage = MutableStateFlow<Uri?>(null)
     val backgroundImage: StateFlow<Uri?> = _backgroundImage.asStateFlow()
 
+    private val _isUserGranted = MutableStateFlow(false)
+    val isUserGranted: StateFlow<Boolean> = _isUserGranted
+
+
     init {
         observeLocationPermission()
     }
@@ -89,6 +93,18 @@ class WeatherViewModel @Inject constructor(
 
     fun toggleTemperatureUnit() {
         _isCelsius.value = !_isCelsius.value
+    }
+
+    fun onLocationPermissionGranted(preciseLoc: Boolean = true) {
+        if (preciseLoc)
+            observeLocationPermission()
+        else
+            _weatherState.value = GetCityCurrentWeatherState.Error("Failed to fetch weather data")
+    }
+
+    fun onLocationPermissionDenied() {
+        _weatherState.value =
+            GetCityCurrentWeatherState.Error("Location permission is required to fetch weather data")
     }
 }
 

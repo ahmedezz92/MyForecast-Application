@@ -38,7 +38,6 @@ fun WeatherScreen(
     val isCelsius by weatherViewModel.isCelsius.collectAsState()
     val weatherData by weatherViewModel.currentCityWeather.collectAsState()
 
-
     Scaffold(
         topBar = {
             TopAppBar(
