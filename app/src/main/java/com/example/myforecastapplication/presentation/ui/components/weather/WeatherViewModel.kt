@@ -43,9 +43,6 @@ class WeatherViewModel @Inject constructor(
     private val _backgroundImage = MutableStateFlow<Uri?>(null)
     val backgroundImage: StateFlow<Uri?> = _backgroundImage.asStateFlow()
 
-    private val _isUserGranted = MutableStateFlow(false)
-    val isUserGranted: StateFlow<Boolean> = _isUserGranted
-
 
     init {
         observeLocationPermission()
