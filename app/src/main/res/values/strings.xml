@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">My Forecast Application</string>
+    <string name="label_forecast">Forecast</string>
+    <string name="label_no_internet_connection">Please check your internet connection\n</string>
+    <string name="hint_enter_city_name">please enter city name\n</string>
+    <string name="label_title">Forecast app</string>
+    <string name="message_empty_history">empty\n</string>
+    <string name="label_humidity">Humidity</string>
+    <string name="label_feels_like">"Feels like: "</string>
+    <string name="label_switch_to_f">Switch to °F</string>
+    <string name="labe_switch_to_c">Switch to °C</string>
+    <string name="label_current_forecast">Current Forecast</string>
+    <string name="label_capture_photo">Capture photo</string>
+</resources>
