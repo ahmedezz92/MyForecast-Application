@@ -22,14 +22,14 @@ fun HistoryList(
     navController: NavController,
     viewModel: HistoryViewModel = hiltViewModel()
 ) {
-    val historyItems by viewModel.historyItems.collectAsState()
+    val historyItems by viewModel.historyState.collectAsState()
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("Weather History") },
                 actions = {
-                    IconButton(onClick = { navController.navigate("forecast") }) {
+                    IconButton(onClick = { navController.navigate("WeatherScreen") }) {
                         Icon(
                             Icons.Default.Add,
                             contentDescription = "Add a new Forecast"

@@ -7,7 +7,7 @@ import com.example.myforecastapplication.data.remote.api.WeatherApiService
 import com.example.myforecastapplication.data.repository.WeatherRepositoryImp
 import com.example.myforecastapplication.domain.repository.WeatherRepository
 import com.example.myforecastapplication.domain.usecase.SavePhotoToGalleryUseCase
-import com.example.myforecastapplication.utils.camera.CameraUtil
+import com.example.myforecastapplication.presentation.ui.components.camera.CameraViewModel
 import com.example.myforecastapplication.utils.location.LocationManager
 import com.example.myforecastapplication.utils.permissions.PermissionManager
 import dagger.Module
@@ -45,12 +45,6 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideCameraUtil(@ApplicationContext context: Context): CameraUtil {
-        return CameraUtil(context)
-    }
-
-    @Provides
-    @Singleton
     fun provideSavePhotoToGalleryUseCase(
         @ApplicationContext context: Context
     ): SavePhotoToGalleryUseCase {
@@ -60,5 +54,11 @@ object AppModule {
     @Singleton
     fun providePermissionManager(@ApplicationContext context: Context): PermissionManager {
         return PermissionManager(context)
+    }
+    @Provides
+    fun provideCameraViewModel(
+        savePhotoToGalleryUseCase: SavePhotoToGalleryUseCase,
+    ): CameraViewModel {
+        return CameraViewModel(savePhotoToGalleryUseCase)
     }
 }

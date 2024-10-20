@@ -25,100 +25,78 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.myforecastapplication.R
 import com.example.myforecastapplication.data.local.HistoryItem
+import com.example.myforecastapplication.data.local.WeatherEntity
 import com.example.myforecastapplication.utils.Constants
+import com.example.myforecastapplication.utils.Constants.URL.URL_IMAGE
 
 @Composable
-fun HistoryItem(historyItem: HistoryItem) {
+fun HistoryItem(historyItem: WeatherEntity) {
     Card(
         modifier = Modifier
-            .wrapContentSize(Alignment.Center)
-            .padding(top = 10.dp),
+            .fillMaxWidth()
+            .padding(4.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 5.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color.DarkGray
+            containerColor = Color(0xFFFEFEFE),
         )
     ) {
-        Column(
+        Row(
             modifier = Modifier
-                .background(Color(0xFF1E2F5C))
-                .padding(16.dp)
+                .background(Color(0xFFFEFEFE))
+                .padding(10.dp)
                 .fillMaxHeight()
-                .wrapContentSize(Alignment.Center), // Center all content inside the Column
-            horizontalAlignment = Alignment.CenterHorizontally, // Center content horizontally
+                .fillMaxWidth(), // Center all content inside the Column
+            verticalAlignment = Alignment.CenterVertically, // Center content horizontally
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            Text(
-                text = historyItem.locationName,
-                fontSize = 30.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White,
-                letterSpacing = 2.sp
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = historyItem.date,
-                fontSize = 24.sp,
-                color = Color.LightGray
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
             AsyncImage(
-                model = Constants.URL.URL_IMAGE.plus(historyItem.conditionIcon),
-                contentDescription = null,
+                model = URL_IMAGE.plus(historyItem.conditionIcon),
+                contentDescription = historyItem.conditionText,
                 modifier = Modifier
-                    .width(100.dp)
-                    .height(100.dp)
+                    .width(60.dp)
+                    .height(60.dp)
             )
-
             Spacer(modifier = Modifier.height(8.dp))
-
-            Row(
-                modifier = Modifier.wrapContentSize(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-
-                ) {
+            Column(
+                modifier = Modifier
+                    .wrapContentSize(Alignment.Center),
+                verticalArrangement = Arrangement.spacedBy(5.dp)
+            ) {
                 Text(
-                    text = "${historyItem.temperature}°C",
-                    fontSize = 30.sp,
-                    color = Color.White
+                    text = historyItem.cityName,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black
+                )
+                Text(
+                    text = historyItem.lastUpdate,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Light,
+                    color = Color.Black
+                )
+                Text(
+                    text = historyItem.conditionText,
+                    fontSize = 12.sp,
+                    color = Color.DarkGray
                 )
             }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentSize(Alignment.Center),
-                horizontalArrangement = Arrangement.spacedBy(15.dp),
-                verticalAlignment = Alignment.CenterVertically,
-
-                ) {
-//                WeatherInfoItem(
-//                    "Wind",
-//                    "${historyItem.windDegree}° ${historyItem.windSpeed} km/h "
-//                )
-            }
             Spacer(modifier = Modifier.height(8.dp))
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentSize(Alignment.Center),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(15.dp),
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
             ) {
+                Text(
+                    text = "${historyItem.temperatureC}°C",
+                    fontSize = 16.sp,
+                    color = Color.Black
+                )
+                Spacer(modifier = Modifier.width(8.dp))
 
-//                WeatherInfoItem(
-//                    stringResource(id = R.string.label_humidity),
-//                    "${historyItem.humidity}%"
-//                )
-//                WeatherInfoItem(
-//                    stringResource(id = R.string.label_feels_like),
-//                    historyItem.feelsLike
-//                )
-
+                Text(
+                    text = "${historyItem.temperatureF}°F",
+                    fontSize = 16.sp,
+                    color = Color.Gray
+                )
             }
 
         }

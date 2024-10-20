@@ -17,15 +17,15 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Card
-import androidx.compose.material3.ExtendedFloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Place
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -36,7 +36,6 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
@@ -48,25 +47,26 @@ import java.util.concurrent.Executor
 
 @Composable
 fun CameraScreen(
-    viewModel: CameraViewModel = hiltViewModel()
+    cameraViewModel: CameraViewModel = hiltViewModel(),
 ) {
-    val cameraState: CameraState by viewModel.state.collectAsState()
+    val cameraState: CameraState by cameraViewModel.capturedImage.collectAsState()
 
     CameraContent(
-        onPhotoCaptured = viewModel::storePhotoInGallery,
-        lastCapturedPhoto = cameraState.capturedImage
+        onPhotoCaptured = cameraViewModel::storePhotoInGallery,
+        lastCapturedPhoto = cameraState.capturedImage,
     )
 }
 
 @Composable
 private fun CameraContent(
     onPhotoCaptured: (Bitmap) -> Unit,
-    lastCapturedPhoto: Bitmap? = null
+    lastCapturedPhoto: Bitmap? = null,
 ) {
 
     val context: Context = LocalContext.current
     val lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current
-    val cameraController: LifecycleCameraController = remember { LifecycleCameraController(context) }
+    val cameraController: LifecycleCameraController =
+        remember { LifecycleCameraController(context) }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -74,10 +74,14 @@ private fun CameraContent(
             ExtendedFloatingActionButton(
                 text = { Text(text = "Take photo") },
                 onClick = { capturePhoto(context, cameraController, onPhotoCaptured) },
-                icon = { Icon(imageVector = Icons.Default.Place, contentDescription = "Camera capture icon") }
+                icon = {
+                    Icon(
+                        imageVector = Icons.Default.Place,
+                        contentDescription = "Camera capture icon"
+                    )
+                }
             )
-        }
-    ) { paddingValues: PaddingValues ->
+        }) { paddingValues: PaddingValues ->
 
         Box(modifier = Modifier.fillMaxSize()) {
             AndroidView(
@@ -136,7 +140,8 @@ private fun LastPhotoPreview(
     lastCapturedPhoto: Bitmap
 ) {
 
-    val capturedPhoto: ImageBitmap = remember(lastCapturedPhoto.hashCode()) { lastCapturedPhoto.asImageBitmap() }
+    val capturedPhoto: ImageBitmap =
+        remember(lastCapturedPhoto.hashCode()) { lastCapturedPhoto.asImageBitmap() }
 
     Card(
         modifier = modifier
@@ -151,12 +156,4 @@ private fun LastPhotoPreview(
             contentScale = androidx.compose.ui.layout.ContentScale.Crop
         )
     }
-}
-
-@Preview
-@Composable
-private fun Preview_CameraContent() {
-    CameraContent(
-        onPhotoCaptured = {}
-    )
 }

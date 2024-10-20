@@ -41,7 +41,7 @@ class SavePhotoToGalleryUseCase @Inject constructor(
                 put(MediaStore.MediaColumns.DATE_TAKEN, nowTimestamp)
                 put(
                     MediaStore.MediaColumns.RELATIVE_PATH,
-                    Environment.DIRECTORY_DCIM + "/YourAppNameOrAnyOtherSubFolderName"
+                    Environment.DIRECTORY_DCIM + "/ForecastApp"
                 )
                 put(MediaStore.MediaColumns.IS_PENDING, 1)
             }

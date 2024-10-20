@@ -1,15 +1,18 @@
 package com.example.myforecastapplication.presentation.ui.components.weather
 
+import android.graphics.Bitmap
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -19,6 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -37,7 +41,8 @@ import com.google.accompanist.permissions.rememberPermissionState
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun WeatherRow(
-    weather: WeatherResponse, isCelsius: Boolean, onButtonSavedClick: (WeatherResponse) -> Unit
+    weather: WeatherResponse, isCelsius: Boolean, onSaveClick: (WeatherResponse) -> Unit,
+    capturedImage: Bitmap?
 ) {
 
     val cameraPermissionState: PermissionState =
@@ -55,7 +60,7 @@ fun WeatherRow(
             modifier = Modifier
                 .background(Color(0xFF1E2F5C))
                 .padding(8.dp)
-                .fillMaxHeight()
+                .wrapContentHeight()
                 .wrapContentSize(Alignment.Center), // Center all content inside the Column
             horizontalAlignment = Alignment.CenterHorizontally, // Center content horizontally
         ) {
@@ -141,26 +146,34 @@ fun WeatherRow(
                 )
 
             }
+            Button(onClick = { onSaveClick(weather) }) {
+                Text(
+                    text = "Save",
+                    color = Color.White
+                )
+            }
             Spacer(modifier = Modifier.height(8.dp))
+
             CameraContent(
                 hasPermission = cameraPermissionState.status.isGranted,
-                onRequestPermission = cameraPermissionState::launchPermissionRequest
+                onRequestPermission = cameraPermissionState::launchPermissionRequest,
             )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Button(onClick = { onButtonSavedClick(weather) }) {
-                Text(
-                    text = "Save", color = Color.White
+            capturedImage?.let { image ->
+                Image(
+                    bitmap = image.asImageBitmap(),
+                    contentDescription = "Captured Image",
+                    modifier = Modifier.size(100.dp)
                 )
             }
         }
+
     }
 }
 
 @Composable
 private fun CameraContent(
-    hasPermission: Boolean, onRequestPermission: () -> Unit
+    hasPermission: Boolean,
+    onRequestPermission: () -> Unit,
 ) {
 
     if (hasPermission) {

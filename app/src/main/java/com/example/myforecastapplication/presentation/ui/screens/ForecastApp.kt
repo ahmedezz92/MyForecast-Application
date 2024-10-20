@@ -9,6 +9,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.myforecastapplication.presentation.ui.components.camera.CameraViewModel
 import com.example.myforecastapplication.presentation.ui.components.history.HistoryList
 import com.example.myforecastapplication.presentation.ui.components.history.HistoryViewModel
 import com.example.myforecastapplication.presentation.ui.components.weather.WeatherScreen
@@ -18,6 +19,7 @@ import com.example.myforecastapplication.presentation.ui.components.weather.Weat
 fun ForecastApp(
     historyViewModel: HistoryViewModel = hiltViewModel(),
     weatherViewModel: WeatherViewModel = hiltViewModel(),
+    cameraViewModel: CameraViewModel = hiltViewModel(),
     onLocationRequestPermission: () -> Unit,
 ) {
     val navController = rememberNavController()
@@ -25,7 +27,7 @@ fun ForecastApp(
     Scaffold { padding ->
         NavHost(
             navController = navController,
-            startDestination = "WeatherScreen",
+            startDestination = "HistoryScreen",
             modifier = Modifier.padding(padding)
         ) {
             composable("HistoryScreen") {

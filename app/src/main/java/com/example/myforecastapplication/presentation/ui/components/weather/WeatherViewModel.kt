@@ -1,15 +1,20 @@
 package com.example.myforecastapplication.presentation.ui.components.weather
 
+import android.content.Context
 import android.graphics.Bitmap
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myforecastapplication.base.BaseResult
 import com.example.myforecastapplication.data.remote.model.WeatherResponse
 import com.example.myforecastapplication.domain.usecase.GetCityCurrentWeatherUseCase
 import com.example.myforecastapplication.domain.usecase.SaveWeatherHistoryUseCase
+import com.example.myforecastapplication.presentation.ui.components.camera.CameraViewModel
 import com.example.myforecastapplication.utils.location.LocationManager
 import com.example.myforecastapplication.utils.permissions.PermissionManager
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,6 +23,8 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.IOException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -26,6 +33,9 @@ class WeatherViewModel @Inject constructor(
     private val saveWeatherHistoryUseCase: SaveWeatherHistoryUseCase,
     private val locationManager: LocationManager,
     private val permissionManager: PermissionManager,
+    private val cameraViewModel: CameraViewModel,
+    @ApplicationContext private val context: Context
+
 ) : ViewModel() {
 
     private val _weatherState =
@@ -43,6 +53,21 @@ class WeatherViewModel @Inject constructor(
 
     init {
         observeLocationPermission()
+        _capturedImage.value =
+            cameraViewModel.capturedImage.value.capturedImage // Set the initial value
+        observeCameraViewModel()
+    }
+
+    private fun observeCameraViewModel() {
+        viewModelScope.launch {
+            cameraViewModel.capturedImage.collect { cameraState ->
+                _capturedImage.value = cameraState.capturedImage
+                Log.d(
+                    "WeatherViewModel",
+                    "Captured image updated: ${cameraState.capturedImage?.hashCode()}"
+                )
+            }
+        }
     }
 
     private fun observeLocationPermission() {
@@ -101,18 +126,35 @@ class WeatherViewModel @Inject constructor(
             GetCityCurrentWeatherState.Error("Location permission is required to fetch weather data")
     }
 
-    fun saveWeatherData(weatherResponse: WeatherResponse,imagePath: String) {
+    fun saveWeatherData(weatherResponse: WeatherResponse) {
         viewModelScope.launch {
+            Log.d(
+                "WeatherViewModel",
+                "Saving weather data, captured image: ${capturedImage.value?.hashCode()}"
+            )
             try {
                 val currentWeather =
                     (weatherState.value as? GetCityCurrentWeatherState.Success)?.data
                 if (currentWeather != null) {
-                    saveWeatherHistoryUseCase(weatherResponse, imagePath)
+                    val imagePath = capturedImage.value?.let { saveImageToInternalStorage(it) }
+                    saveWeatherHistoryUseCase(weatherResponse, imagePath ?: "")
+                    _capturedImage.value = null // Clear the captured image after saving
                 }
-                _capturedImage.value = null // Clear the captured image after saving
             } catch (e: Exception) {
                 // Handle error
             }
+        }
+    }
+
+    private suspend fun saveImageToInternalStorage(bitmap: Bitmap): String {
+        return withContext(Dispatchers.IO) {
+            val fileName = "weather_image_${System.currentTimeMillis()}.jpg"
+            context.openFileOutput(fileName, Context.MODE_PRIVATE).use { stream ->
+                if (!bitmap.compress(Bitmap.CompressFormat.JPEG, 95, stream)) {
+                    throw IOException("Couldn't save bitmap.")
+                }
+            }
+            context.getFileStreamPath(fileName).absolutePath
         }
     }
 }

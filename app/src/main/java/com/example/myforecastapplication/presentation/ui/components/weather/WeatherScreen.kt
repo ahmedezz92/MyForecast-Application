@@ -37,6 +37,7 @@ fun WeatherScreen(
     val weatherState by weatherViewModel.weatherState.collectAsState()
     val isCelsius by weatherViewModel.isCelsius.collectAsState()
     val weatherData by weatherViewModel.currentCityWeather.collectAsState()
+    val capturedImage by weatherViewModel.capturedImage.collectAsState()
 
     Scaffold(
         topBar = {
@@ -82,11 +83,12 @@ fun WeatherScreen(
                         }
                     }
                     Spacer(modifier = Modifier.height(8.dp))
-                    weatherData?.let {
-                        WeatherRow(weather = it, isCelsius,
-                            onButtonSavedClick = { savedWeather ->
-                                weatherViewModel.saveWeatherData(savedWeather, "")
-                            })
+                    weatherData?.let { weatherResponse ->
+                        WeatherRow(
+                            weather = weatherResponse, isCelsius,
+                            onSaveClick = { weatherViewModel.saveWeatherData(weatherResponse) },
+                            capturedImage = capturedImage
+                        )
                     }
                 }
 
