@@ -29,5 +29,6 @@ class PermissionManager @Inject constructor(private val context: Context) {
             Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.ACCESS_COARSE_LOCATION
         )
+        val CAMERA_PERMISSION = arrayOf(Manifest.permission.CAMERA)
     }
 }

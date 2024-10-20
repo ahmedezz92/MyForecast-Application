@@ -1,23 +1,20 @@
 package com.example.myforecastapplication.presentation.ui.components.weather
 
-import android.content.Intent
-import android.net.Uri
-import androidx.lifecycle.LifecycleOwner
+import android.graphics.Bitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myforecastapplication.base.BaseResult
 import com.example.myforecastapplication.data.remote.model.WeatherResponse
 import com.example.myforecastapplication.domain.usecase.GetCityCurrentWeatherUseCase
+import com.example.myforecastapplication.domain.usecase.SaveWeatherHistoryUseCase
 import com.example.myforecastapplication.utils.location.LocationManager
 import com.example.myforecastapplication.utils.permissions.PermissionManager
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
@@ -26,6 +23,7 @@ import javax.inject.Inject
 @HiltViewModel
 class WeatherViewModel @Inject constructor(
     private val getCityCurrentWeatherUseCase: GetCityCurrentWeatherUseCase,
+    private val saveWeatherHistoryUseCase: SaveWeatherHistoryUseCase,
     private val locationManager: LocationManager,
     private val permissionManager: PermissionManager,
 ) : ViewModel() {
@@ -40,9 +38,8 @@ class WeatherViewModel @Inject constructor(
     private val _isCelsius = MutableStateFlow(true)
     val isCelsius: StateFlow<Boolean> = _isCelsius.asStateFlow()
 
-    private val _backgroundImage = MutableStateFlow<Uri?>(null)
-    val backgroundImage: StateFlow<Uri?> = _backgroundImage.asStateFlow()
-
+    private val _capturedImage = MutableStateFlow<Bitmap?>(null)
+    val capturedImage: StateFlow<Bitmap?> = _capturedImage.asStateFlow()
 
     init {
         observeLocationPermission()
@@ -102,6 +99,21 @@ class WeatherViewModel @Inject constructor(
     fun onLocationPermissionDenied() {
         _weatherState.value =
             GetCityCurrentWeatherState.Error("Location permission is required to fetch weather data")
+    }
+
+    fun saveWeatherData(weatherResponse: WeatherResponse,imagePath: String) {
+        viewModelScope.launch {
+            try {
+                val currentWeather =
+                    (weatherState.value as? GetCityCurrentWeatherState.Success)?.data
+                if (currentWeather != null) {
+                    saveWeatherHistoryUseCase(weatherResponse, imagePath)
+                }
+                _capturedImage.value = null // Clear the captured image after saving
+            } catch (e: Exception) {
+                // Handle error
+            }
+        }
     }
 }
 

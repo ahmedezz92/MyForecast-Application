@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
@@ -33,7 +32,8 @@ fun WeatherScreen(
     navController: NavHostController,
     weatherViewModel: WeatherViewModel,
     onLocationRequestPermission: () -> Unit,
-) {
+
+    ) {
     val weatherState by weatherViewModel.weatherState.collectAsState()
     val isCelsius by weatherViewModel.isCelsius.collectAsState()
     val weatherData by weatherViewModel.currentCityWeather.collectAsState()
@@ -72,8 +72,6 @@ fun WeatherScreen(
 
 
                 is GetCityCurrentWeatherState.Success -> {
-
-                    Spacer(modifier = Modifier.height(8.dp))
                     Row {
                         Button(onClick = { weatherViewModel.toggleTemperatureUnit() }) {
                             Text(
@@ -82,11 +80,14 @@ fun WeatherScreen(
                                 )
                             )
                         }
-                        Spacer(modifier = Modifier.width(16.dp))
-
                     }
                     Spacer(modifier = Modifier.height(8.dp))
-                    weatherData?.let { WeatherRow(weather = it, isCelsius) }
+                    weatherData?.let {
+                        WeatherRow(weather = it, isCelsius,
+                            onButtonSavedClick = { savedWeather ->
+                                weatherViewModel.saveWeatherData(savedWeather, "")
+                            })
+                    }
                 }
 
             }

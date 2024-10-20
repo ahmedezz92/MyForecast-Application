@@ -38,7 +38,6 @@ fun ForecastApp(
                 WeatherScreen(
                     navController = navController, weatherViewModel = weatherViewModel,
                     onLocationRequestPermission = onLocationRequestPermission,
-
                 )
             }
         }

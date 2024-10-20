@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface WeatherDao {
@@ -18,4 +19,7 @@ interface WeatherDao {
 
     @Query("DELETE FROM weather_table WHERE timestamp < :timestamp")
     suspend fun deleteOldCache(timestamp: Long)
+
+    @Query("SELECT * FROM weather_table ORDER BY timestamp DESC")
+    fun getAllWeatherHistory(): Flow<List<WeatherEntity>>
 }

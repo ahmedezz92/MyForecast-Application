@@ -12,11 +12,12 @@ data class WeatherEntity(
     val temperatureC: Double,
     val temperatureF: Double,
     val conditionIcon: String,
-    val conditionText:String,
+    val conditionText: String,
     val windDegree: Int,
     val windSpeed: Double,
     val humidity: Int,
     val lastUpdate: String,
-    val feelslike:Double,
-    val timestamp: Long = System.currentTimeMillis()
+    val feelslike: Double,
+    val timestamp: Long = System.currentTimeMillis(),
+    val imagePath: String
 )

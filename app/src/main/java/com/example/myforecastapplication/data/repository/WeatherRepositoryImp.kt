@@ -6,6 +6,7 @@ import com.example.myforecastapplication.core.data.utils.ErrorResponse
 import com.example.myforecastapplication.core.data.utils.WrappedErrorResponse
 import com.example.myforecastapplication.data.local.HistoryItem
 import com.example.myforecastapplication.data.local.WeatherDao
+import com.example.myforecastapplication.data.local.WeatherEntity
 import com.example.myforecastapplication.data.remote.api.WeatherApiService
 import com.example.myforecastapplication.data.remote.model.ForecastResponse
 import com.example.myforecastapplication.domain.repository.WeatherRepository
@@ -82,5 +83,12 @@ class WeatherRepositoryImp @Inject constructor(
         }
     }
 
+    override suspend fun saveWeatherHistory(weatherHistoryItem: WeatherEntity) {
+        weatherDao.insertWeather(weatherHistoryItem)
+    }
+
+    override suspend fun getAllWeatherHistory(): Flow<List<WeatherEntity>> {
+        return weatherDao.getAllWeatherHistory()
+    }
 
 }

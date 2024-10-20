@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
@@ -25,10 +26,22 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.myforecastapplication.R
 import com.example.myforecastapplication.data.remote.model.WeatherResponse
+import com.example.myforecastapplication.presentation.ui.components.camera.CameraScreen
+import com.example.myforecastapplication.presentation.ui.components.camera.nopermission.NoPermissionScreen
 import com.example.myforecastapplication.utils.Constants.URL.URL_IMAGE
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.PermissionState
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun WeatherRow(weather: WeatherResponse, isCelsius: Boolean) {
+fun WeatherRow(
+    weather: WeatherResponse, isCelsius: Boolean, onButtonSavedClick: (WeatherResponse) -> Unit
+) {
+
+    val cameraPermissionState: PermissionState =
+        rememberPermissionState(android.Manifest.permission.CAMERA)
     Card(
         modifier = Modifier
             .wrapContentSize(Alignment.Center)
@@ -41,7 +54,7 @@ fun WeatherRow(weather: WeatherResponse, isCelsius: Boolean) {
         Column(
             modifier = Modifier
                 .background(Color(0xFF1E2F5C))
-                .padding(16.dp)
+                .padding(8.dp)
                 .fillMaxHeight()
                 .wrapContentSize(Alignment.Center), // Center all content inside the Column
             horizontalAlignment = Alignment.CenterHorizontally, // Center content horizontally
@@ -56,9 +69,7 @@ fun WeatherRow(weather: WeatherResponse, isCelsius: Boolean) {
 
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = weather.location.country,
-                fontSize = 24.sp,
-                color = Color.LightGray
+                text = weather.location.country, fontSize = 24.sp, color = Color.LightGray
             )
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -92,14 +103,10 @@ fun WeatherRow(weather: WeatherResponse, isCelsius: Boolean) {
                         "${weather.current.temp_c}°C"
                     } else {
                         "${weather.current.temp_f}°F"
-                    },
-                    fontSize = 30.sp,
-                    color = Color.White
+                    }, fontSize = 30.sp, color = Color.White
                 )
                 Text(
-                    text = weather.current.condition.text,
-                    fontSize = 14.sp,
-                    color = Color.White
+                    text = weather.current.condition.text, fontSize = 14.sp, color = Color.White
                 )
             }
 
@@ -114,8 +121,7 @@ fun WeatherRow(weather: WeatherResponse, isCelsius: Boolean) {
 
                 ) {
                 WeatherInfoItem(
-                    "Wind",
-                    "${weather.current.wind_degree}° ${weather.current.wind_kph} km/h "
+                    "Wind", "${weather.current.wind_degree}° ${weather.current.wind_kph} km/h "
                 )
             }
             Spacer(modifier = Modifier.height(8.dp))
@@ -128,16 +134,38 @@ fun WeatherRow(weather: WeatherResponse, isCelsius: Boolean) {
             ) {
 
                 WeatherInfoItem(
-                    stringResource(id = R.string.label_humidity),
-                    "${weather.current.humidity}%"
+                    stringResource(id = R.string.label_humidity), "${weather.current.humidity}%"
                 )
                 WeatherInfoItem(
-                    stringResource(id = R.string.label_feels_like),
-                    "${weather.current.feelslike_c}"
+                    stringResource(id = R.string.label_feels_like), "${weather.current.feelslike_c}"
                 )
 
             }
+            Spacer(modifier = Modifier.height(8.dp))
+            CameraContent(
+                hasPermission = cameraPermissionState.status.isGranted,
+                onRequestPermission = cameraPermissionState::launchPermissionRequest
+            )
 
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Button(onClick = { onButtonSavedClick(weather) }) {
+                Text(
+                    text = "Save", color = Color.White
+                )
+            }
         }
+    }
+}
+
+@Composable
+private fun CameraContent(
+    hasPermission: Boolean, onRequestPermission: () -> Unit
+) {
+
+    if (hasPermission) {
+        CameraScreen()
+    } else {
+        NoPermissionScreen(onRequestPermission)
     }
 }
